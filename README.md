@@ -15,3 +15,4 @@ lastname firstname | course short label | course start time | location | status
 
 ## Run
 
+Execute the `crawl_fdisk_courses.py` with Python 3
