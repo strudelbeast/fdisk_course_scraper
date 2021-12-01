@@ -51,7 +51,7 @@ def main():
         #Remove unneded lines
         df = tabledata.iloc[:-5, 7:]
         df.drop(labels=[0, 2], axis=0, inplace=True)
-        df.drop(labels=[8, 10, 12, 14, 16, 18, 19, 20, 21, 22, 23, 24, 26, 25, 27], axis=1, inplace=True)
+        df.drop(labels=[7, 8, 10, 12, 14, 16, 18, 20, 21, 22, 23, 24, 25, 26, 27], axis=1, inplace=True)
 
         #Data Cleaning
         #Set Column Labels and remove them from the data
@@ -62,11 +62,15 @@ def main():
         df.rename(columns={'Kursart (Kurzbez.)': 'Kursbez:'}, inplace=True)
         # Change the location name of the NÖ Feuerwehr- und Sicherheitszentrum to NÖFSZ
         df.loc[df['Ort'] == 'Tulln, NÖ Feuerwehr- und Sicherheitszentrum', 'Ort'] = 'NÖFSZ'
+
+        df['Ort'] = df['Ort'].str.replace('Feuerwehrhaus', 'Fwh.', regex=False)
+        df['Ort'] = df['Ort'].str.replace('Feuerwehr', 'Fw.', regex=False)
+
         # Just display the first- and lastname (remove rank and number)
         df['Name'] = df['Name'].apply(lambda x: x[:x.find(',')])
 
         # Remove lines where booking is already rejected by the system
-        df.drop(df[df['Teilnehmerstatus'] == 'Abgelehnt vom System'].index, inplace=True)
+        df.drop(df[(df['Teilnehmerstatus'] == 'Abgelehnt vom System') | (df['Teilnehmerstatus'] == 'Abgelehnt Veranstalter')].index, inplace=True)
         # Drop the end date column
         df.drop(labels='Kursende', axis=1, inplace=True)
 
