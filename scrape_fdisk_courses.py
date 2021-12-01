@@ -49,17 +49,20 @@ def main():
         tabledata = pd.read_html(str(table))[0]
 
         #Remove unneded lines
-        df = tabledata.iloc[:-5, 7:]
-        df.drop(labels=[0, 2], axis=0, inplace=True)
-        df.drop(labels=[7, 8, 10, 12, 14, 16, 18, 20, 21, 22, 23, 24, 25, 26, 27], axis=1, inplace=True)
+        df = tabledata.dropna(axis=0, how='all')
+        df.drop(df.tail(2).index, inplace=True)
+        df.dropna(axis=1, how='all', inplace=True)
 
         #Data Cleaning
         #Set Column Labels and remove them from the data
         df.columns = df.iloc[0:1].to_numpy()[0]
         df = df.iloc[1:]
 
+        # Remove not needed columns in result table
+        df.drop(labels=['Anwesenheitsstatus', 'Leistungsart', 'Bemerkung', "durchführende Instanz"], inplace=True, axis=1)
+
         # Rename the couse title column name
-        df.rename(columns={'Kursart (Kurzbez.)': 'Kursbez:'}, inplace=True)
+        df.rename(columns={'Kursart (Kurzbez.)': 'Kursbez.'}, inplace=True)
         # Change the location name of the NÖ Feuerwehr- und Sicherheitszentrum to NÖFSZ
         df.loc[df['Ort'] == 'Tulln, NÖ Feuerwehr- und Sicherheitszentrum', 'Ort'] = 'NÖFSZ'
 
