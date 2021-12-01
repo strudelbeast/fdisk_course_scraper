@@ -1,23 +1,21 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
-from dotenv import load_dotenv
-import os
 from bs4 import BeautifulSoup
 import pandas as pd
+from typing import Union
+import os
 
-
-def main():
-    #load environment variables
-    load_dotenv()
-
-    #configure the browser
+def fetch_fdisk_table(write_to_file: bool) -> Union[pd.DataFrame, None]:
+    # configure the browser
     options = Options()
     options.add_argument("--headless")
     options.add_argument('--disable-gpu')
     options.add_argument('--log-level=3')
     driver = webdriver.Firefox(executable_path='./geckodriver.exe', options=options)
+
+    df: pd.DataFrame
     try:
-        print("Logging in")
+        print("Logging in to FDISK")
         driver.get("https://app.fdisk.at/fdisk/module/vws/logins/logins.aspx")
 
         # Fill out form
@@ -48,18 +46,19 @@ def main():
         print("Preparing data")
         tabledata = pd.read_html(str(table))[0]
 
-        #Remove unneded lines
+        # Remove unneded lines
         df = tabledata.dropna(axis=0, how='all')
         df.drop(df.tail(2).index, inplace=True)
         df.dropna(axis=1, how='all', inplace=True)
 
-        #Data Cleaning
-        #Set Column Labels and remove them from the data
+        # Data Cleaning
+        # Set Column Labels and remove them from the data
         df.columns = df.iloc[0:1].to_numpy()[0]
         df = df.iloc[1:]
 
         # Remove not needed columns in result table
-        df.drop(labels=['Anwesenheitsstatus', 'Leistungsart', 'Bemerkung', "durchführende Instanz"], inplace=True, axis=1)
+        df.drop(labels=['Anwesenheitsstatus', 'Leistungsart', 'Bemerkung', "durchführende Instanz"], inplace=True,
+                axis=1)
 
         # Rename the couse title column name
         df.rename(columns={'Kursart (Kurzbez.)': 'Kursbez.'}, inplace=True)
@@ -73,7 +72,8 @@ def main():
         df['Name'] = df['Name'].apply(lambda x: x[:x.find(',')])
 
         # Remove lines where booking is already rejected by the system
-        df.drop(df[(df['Teilnehmerstatus'] == 'Abgelehnt vom System') | (df['Teilnehmerstatus'] == 'Abgelehnt Veranstalter')].index, inplace=True)
+        df.drop(df[(df['Teilnehmerstatus'] == 'Abgelehnt vom System') | (
+                df['Teilnehmerstatus'] == 'Abgelehnt Veranstalter')].index, inplace=True)
         # Drop the end date column
         df.drop(labels='Kursende', axis=1, inplace=True)
 
@@ -82,14 +82,14 @@ def main():
         df.sort_values(by=['sort'], inplace=True)
         df.drop(labels='sort', inplace=True, axis=1)
 
-        print("Generating excel")
-        df.to_excel('out.xlsx', index=False)
+        if write_to_file:
+            print("Generating excel")
+            df.to_excel('out.xlsx', index=False)
 
     except Exception as ex:
-        print("There was an error. The program didn't succeed!")
+        print("There was an error while fetching data. The program didn't succeed!")
         print(ex)
     finally:
         driver.close()
 
-if __name__ == "__main__":
-    main()
+    return df

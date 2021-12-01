@@ -17,9 +17,11 @@ It gets exported as an excel in the following format:
 * python-dotenv
 * openpyxl
 * html5lib
+* tabulate
 * lxml
 
 ## Run
 
 * create an `.env` file with your credantials like in `example.env`
-* Execute the `scrape_fdisk_courses.py` with Python 3
+* Watch/change flags in `__main__.py`
+* Execute the `__main__.py` with Python 3

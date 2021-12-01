@@ -1,5 +1,6 @@
-pandas==1.1.4
-selenium==3.141.0
-beautifulsoup4==4.9.3
-python-dotenv==0.18.0
+pandas
+selenium
+beautifulsoup4
+python-dotenv
 openpyxl
+tabulate
