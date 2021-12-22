@@ -53,7 +53,7 @@ def dataframe_to_markdown(df: pd.DataFrame) -> str:
     result = df.to_markdown(index=False, tablefmt='github')
     if result is not None:
         result += '\n<br/>\nUpdate '
-        result += datetime.date.today().strftime("%d.%m.%Y")
+        result += datetime.now().strftime("%d.%m.%Y %H:%M")
 
     return result
 

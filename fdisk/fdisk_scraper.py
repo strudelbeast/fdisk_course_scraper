@@ -4,8 +4,13 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from typing import Union
 import os
+from datetime import date, datetime
+from config import flags
 
-def fetch_fdisk_table(write_to_file: bool) -> Union[pd.DataFrame, None]:
+pd.set_option('mode.chained_assignment', None)
+
+
+def fetch_fdisk_table() -> Union[pd.DataFrame, None]:
     # configure the browser
     options = Options()
     options.add_argument("--headless")
@@ -15,10 +20,9 @@ def fetch_fdisk_table(write_to_file: bool) -> Union[pd.DataFrame, None]:
 
     df: pd.DataFrame
     try:
-        print("Logging in to FDISK")
         driver.get("https://app.fdisk.at/fdisk/module/vws/logins/logins.aspx")
 
-        # Fill out form
+        # Fill in login form
         loginE = driver.find_element_by_id('login')
         loginE.clear()
         loginE.send_keys(os.environ.get("FDISK_USERNAME"))
@@ -37,13 +41,13 @@ def fetch_fdisk_table(write_to_file: bool) -> Union[pd.DataFrame, None]:
             '&search=1'
             '&anzeige_count=ALLE'.format(instanzennummer=os.environ.get("FDISK_INSTANZNUMMER")))
 
-        print("Scraping table")
+        # Scraping table
 
         table_kurse = driver.find_element_by_xpath('/html/body/table[2]/tbody/tr[2]/td[1]')
         soup = BeautifulSoup(table_kurse.get_attribute('innerHTML'), 'html.parser')
         table = soup.select("table")[0]
 
-        print("Preparing data")
+        # Preparing data
         tabledata = pd.read_html(str(table))[0]
 
         # Remove unneded lines
@@ -80,10 +84,15 @@ def fetch_fdisk_table(write_to_file: bool) -> Union[pd.DataFrame, None]:
         # Sorting by begin date
         df['sort'] = (pd.to_datetime(df['Kursbeginn'], format='%d.%m.%Y %H:%M'))
         df.sort_values(by=['sort'], inplace=True)
+
+        # just show courses of the future
+        if flags.REMOVE_PAST_COURSES:
+            df = df[df['sort'].dt.date >= date.today()]
+
         df.drop(labels='sort', inplace=True, axis=1)
 
-        if write_to_file:
-            print("Generating excel")
+        if flags.WRITE_FDISK_TABLE_TO_FILE:
+            print(datetime.now().strftime("[%d-%b-%Y %H:%M:%S]"), "Successfully written table to file")
             df.to_excel('out.xlsx', index=False)
 
     except Exception as ex:

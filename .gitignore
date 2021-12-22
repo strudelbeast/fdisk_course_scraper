@@ -3,3 +3,6 @@
 /.idea
 !example.env
 *out.xlsx
+*/__pycache__
+tokens.json
+*.log
