@@ -4,26 +4,26 @@
 [![DISCLAIMER: This project is not using official APIs](https://img.shields.io/badge/DISCLAIMER-This_project_is_not_using_official_APIs-red.svg)](https://shields.io/)
 [![Python version: >= 3.7](https://img.shields.io/badge/python->=3.7-blue.svg)](https://shields.io/)
 
-This scraper is used to get the courses from [FDISK](app.fdisk.at), which is used to book courses for the austrian firefighters.
+This scraper is used to get the courses from [FDISK](app.fdisk.at), which is among other things used to book courses for firefighters in multiple states of austria.
 It gets exported as an excel in the following format:
 
 | Name               | Kursbez. | Kursbeginn | Ort    | Teilnehmerstatus       |
 |--------------------|----------|------------|--------|------------------------|
 | Mustermann Max     | TE10     | 31.12.2021 | NÖFSZ  | Teilnehmerliste        |
-| Mustermann Franz   | GFÜ      | 31.11.2021 | FF XYZ | Kandidatenliste        |
+| Mustermann Franz   | GFÜ      | 31.11.2021 | Fw XYZ | Kandidatenliste        |
 | Mustermann Melissa | BD       | 31.10.2021 | NÖFSZ  | Warteliste             |
 | Mustermann Klaus   | SD20     | 31.10.2021 | NÖFSZ  | Abgelehnt Veranstalter |
 | Mustermann Heinz   | FÜ20     | 31.10.2021 | NÖFSZ  | Abgelehnt vom System   |
 
 The Blackboard will be displayed in the following format
 
-| Name               | Kursbez. | Kursbeginn | Ort     | Teilnehmerstatus           |
-|--------------------|----------|------------|---------|----------------------------|
-| Mustermann Max     | TE10     | 31.12.2021 | NÖFSZ   | **Teilnehmerliste**        |
-| Mustermann Franz   | GFÜ      | 31.11.2021 | FF XYZ  | Kandidatenliste            |
-| Mustermann Melissa | BD       | 31.10.2021 | NÖFSZ   | *Warteliste*               |
-| Mustermann Klaus   | SD20     | 31.10.2021 | NÖFSZ   | ~~Abgelehnt Veranstalter~~ |
-| Mustermann Heinz   | FÜ20     | 31.10.2021 | NÖFSZ   | ~~Abgelehnt vom System~~   |
+| Name                 | Kursbez. | Kursbeginn     | Ort       | Teilnehmerstatus           |
+|----------------------|----------|----------------|-----------|----------------------------|
+| **Mustermann Max**   | **TE10** | **31.12.2021** | **NÖFSZ** | **Teilnehmerliste**        |
+| Mustermann Franz     | GFÜ      | 31.11.2021     | Fw XYZ    | Kandidatenliste            |
+| *Mustermann Melissa* | *BD*     | *31.10.2021*   | *NÖFSZ*   | *Warteliste*               |
+| ~~Mustermann Klaus~~ | ~~SD20~~ | ~~31.10.2021~~ | ~~NÖFSZ~~ | ~~Abgelehnt Veranstalter~~ |
+| ~~Mustermann Heinz~~ | ~~FÜ20~~ | ~~31.10.2021~~ | ~~NÖFSZ~~ | ~~Abgelehnt vom System~~   |
 
 Update 21.12.2021 12:21
 
@@ -47,6 +47,7 @@ Update 21.12.2021 12:21
   * if the table gets written into an xlsx file
   * if the table gets written into the BlaulichtSMS Blackboard.
   * if the courses of the past should get removed
+  * if declined courses should get removed
 
 ## Run
 

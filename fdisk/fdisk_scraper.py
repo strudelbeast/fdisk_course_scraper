@@ -36,7 +36,7 @@ def fetch_fdisk_table() -> Union[pd.DataFrame, None]:
         driver.get(
             f'https://app.fdisk.at/fdisk/module/kvw/karriere/AngemeldeteKurseLFKDOList.aspx?'
             'instanzennummer_person={instanzennummer}'
-            '&ordnung=zuname%2Cvorname%2Ckursartenbez%2Ckursbeginn'
+            '&ordnung=kursbeginn%2Ckursartenbez%2Czuname%2Cvorname'
             '&orderType=ASC'
             '&search=1'
             '&anzeige_count=ALLE'.format(instanzennummer=os.environ.get("FDISK_INSTANZNUMMER")))
@@ -76,20 +76,18 @@ def fetch_fdisk_table() -> Union[pd.DataFrame, None]:
         df['Name'] = df['Name'].apply(lambda x: x[:x.find(',')])
 
         # Remove lines where booking is already rejected by the system
-        df.drop(df[(df['Teilnehmerstatus'] == 'Abgelehnt vom System') | (
-                df['Teilnehmerstatus'] == 'Abgelehnt Veranstalter')].index, inplace=True)
+        if flags.REMOVE_DECLINED_COURSES:
+            df.drop(df[(df['Teilnehmerstatus'] == 'Abgelehnt vom System') | (
+                    df['Teilnehmerstatus'] == 'Abgelehnt Veranstalter')].index, inplace=True)
+
         # Drop the end date column
         df.drop(labels='Kursende', axis=1, inplace=True)
 
-        # Sorting by begin date
-        df['sort'] = (pd.to_datetime(df['Kursbeginn'], format='%d.%m.%Y %H:%M'))
-        df.sort_values(by=['sort'], inplace=True)
-
         # just show courses of the future
         if flags.REMOVE_PAST_COURSES:
+            df['sort'] = (pd.to_datetime(df['Kursbeginn'], format='%d.%m.%Y %H:%M'))
             df = df[df['sort'].dt.date >= date.today()]
-
-        df.drop(labels='sort', inplace=True, axis=1)
+            df.drop(labels='sort', inplace=True, axis=1)
 
         if flags.WRITE_FDISK_TABLE_TO_FILE:
             print(datetime.now().strftime("[%d-%b-%Y %H:%M:%S]"), "Successfully written table to file")
